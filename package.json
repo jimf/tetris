@@ -1,0 +1,35 @@
+{
+  "name": "tetris",
+  "version": "1.0.0",
+  "description": "Canvas Tetris game",
+  "main": "src/index.js",
+  "private": true,
+  "scripts": {
+    "coverage": "istanbul cover test/*.js",
+    "coveralls": "npm run coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "lint": "jshint .",
+    "start": "budo src/index.js --live --open",
+    "test": "tape test/*.js",
+    "validate": "npm run lint && npm test && npm run coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jimf/tetris"
+  },
+  "author": "Jim Fitzpatrick",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jimf/tetris/issues"
+  },
+  "homepage": "https://github.com/jimf/tetris",
+  "devDependencies": {
+    "browserify": "^13.0.0",
+    "budo": "^8.0.4",
+    "istanbul": "^0.3.22",
+    "jshint": "^2.7.0",
+    "tape": "^4.0.0"
+  },
+  "dependencies": {
+    "lodash": "^4.2.1"
+  }
+}

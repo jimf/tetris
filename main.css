@@ -1,0 +1,38 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+*, :before, :after {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+html {
+  background-color: transparent;
+  height: 100%;
+  text-align: center;
+}
+
+html:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -0.25em;
+}
+
+body {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  background-color: #D3E2B6;
+  background: linear-gradient(#4cb4e9, #71c8ec);
+  vertical-align: middle;
+}
+
+#game {
+  background-color: #65688d;
+  border: 2px solid #789fd1;
+}
