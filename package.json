@@ -30,6 +30,7 @@
     "tape": "^4.0.0"
   },
   "dependencies": {
-    "lodash": "^4.2.1"
+    "lodash": "^4.2.1",
+    "ramda": "^0.19.1"
   }
 }
