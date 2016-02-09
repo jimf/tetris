@@ -108,6 +108,7 @@ test('systems.src.shiftLeft() without obstruction', function(t) {
 
     function testcase(opts) {
         var previous = subject.createPiece(opts.shape);
+        previous.y = 0;
 
         opts.expectedShifts.forEach(function(shift) {
             var shifted = subject.shiftLeft(previous, board);
@@ -127,4 +128,60 @@ test('systems.src.shiftLeft() without obstruction', function(t) {
     ].forEach(testcase);
 
     t.end();
+});
+
+test('systems.src.shiftRight() without obstruction', function(t) {
+    var board = subject.createBoard();
+
+    function testcase(opts) {
+        var previous = subject.createPiece(opts.shape);
+        previous.y = 0;
+
+        opts.expectedShifts.forEach(function(shift) {
+            var shifted = subject.shiftRight(previous, board);
+            t.equal(shifted.x, shift);
+            previous = shifted;
+        });
+    }
+
+    [
+        { shape: 'I', expectedShifts: [4, 5, 6, 6] },
+        { shape: 'J', expectedShifts: [4, 5, 6, 7, 7] },
+        { shape: 'L', expectedShifts: [4, 5, 6, 7, 7] },
+        { shape: 'O', expectedShifts: [4, 5, 6, 7, 7] },
+        { shape: 'S', expectedShifts: [4, 5, 6, 7, 7] },
+        { shape: 'T', expectedShifts: [4, 5, 6, 7, 7] },
+        { shape: 'Z', expectedShifts: [4, 5, 6, 7, 7] }
+    ].forEach(testcase);
+
+    t.end();
+});
+
+test('systems.src.applyPiece()', function(t) {
+    var board = subject.createBoard();
+    var piece = subject.createPiece('O');
+    piece.y = 0;
+
+    t.equal(subject.applyPiece(piece, board), [
+        [0, 0, 0, 0, 'O', 'O', 0, 0, 0, 0],
+        [0, 0, 0, 0, 'O', 'O', 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ]);
 });

@@ -276,11 +276,42 @@ function shiftLeft(piece, board) {
     )(piece);
 }
 
+/**
+ * Given a piece and a board, return a new piece that is shifted one position
+ * to the left if able. Otherwise return the original piece.
+ *
+ * @param {object} piece Tetromino piece
+ * @param {object} board Game board
+ * @return {object} Shifted piece
+ */
+function shiftRight(piece, board) {
+    return compose(
+        ifElse(
+            isValidPosition(__, board),
+            identity,
+            always(piece)
+        ),
+        evolve({ x: inc })
+    )(piece);
+}
+
+/**
+ * Given a piece and a board, return a new board with the piece applied.
+ *
+ * @param {object} piece Tetromino piece
+ * @param {object} board Game board
+ * @return {object} Game board
+ */
+function applyPiece(piece, board) {
+
+}
+
 module.exports = {
     createBoard: createBoard,
     createPiece: createPiece,
     isValidPosition: isValidPosition,
     rotateLeft: rotateLeft,
     rotateRight: rotateRight,
-    shiftLeft: shiftLeft
+    shiftLeft: shiftLeft,
+    shiftRight: shiftRight
 };
