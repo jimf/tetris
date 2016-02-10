@@ -11,17 +11,22 @@ var compose = require('ramda/src/compose');
 var curry = require('ramda/src/curry');
 var dec = require('ramda/src/dec');
 var evolve = require('ramda/src/evolve');
+var identical = require('ramda/src/identical');
 var identity = require('ramda/src/identity');
 var ifElse = require('ramda/src/ifElse');
 var inc = require('ramda/src/inc');
 var modulo = require('ramda/src/modulo');
 var range = require('ramda/src/range');
 var times = require('ramda/src/times');
+var update = require('ramda/src/update');
 
 /**
  * Normalization offset between board and piece.
  */
 var OFFSET = 4;
+
+var BOARD_WIDTH = 10;
+var BOARD_HEIGHT = 20;
 
 /**
  * All rotation states of all 7 tetrominoes. Based on the following 4x4 grid:
@@ -163,7 +168,7 @@ var rotations = {
  * @return {int[]}
  */
 function createRow() {
-    return range(0, 10).map(function() {
+    return range(0, BOARD_WIDTH).map(function() {
         return 0;
     });
 }
@@ -174,7 +179,7 @@ function createRow() {
  * @return {int[][]}
  */
 function createBoard() {
-    return times(createRow, 20);
+    return times(createRow, BOARD_HEIGHT);
 }
 
 /**
@@ -201,7 +206,29 @@ function createPiece(shape) {
  * @return {boolean}
  */
 function isWithinBounds(x, y) {
-    return 0 <= x && x < 10 && 0 <= y && y < 20;
+    return 0 <= x && x < BOARD_WIDTH && 0 <= y && y < BOARD_HEIGHT;
+}
+
+/**
+ * Given a piece and rotation cell, return the adjusted x coordinate in
+ * relation to an SRS board.
+ *
+ * @param {object} piece Tetromino piece
+ * @return {number}
+ */
+function adjustX(piece, cell) {
+    return cell[0] + piece.x;
+}
+
+/**
+ * Given a piece and rotation cell, return the adjusted y coordinate in
+ * relation to an SRS board.
+ *
+ * @param {object} piece Tetromino piece
+ * @return {number}
+ */
+function adjustY(piece, cell) {
+    return cell[1] + piece.y;
 }
 
 /**
@@ -213,12 +240,12 @@ function isWithinBounds(x, y) {
  * @return {boolean}
  */
 var isValidPosition = curry(function isValidPosition(piece, board) {
-    return !rotations[piece.shape][piece.rotation].some(function(block) {
-        var blockX = block[0] + piece.x;
-        var blockY = block[1] + piece.y;
+    return !rotations[piece.shape][piece.rotation].some(function(cell) {
+        var boardX = adjustX(piece, cell);
+        var boardY = adjustY(piece, cell);
 
-        return !isWithinBounds(blockX, blockY) ||
-            board[blockY][blockX] !== 0;
+        return !isWithinBounds(boardX, boardY) ||
+            board[boardY][boardX] !== 0;
     });
 });
 
@@ -258,23 +285,24 @@ function rotateRight(piece, board) {
 }
 
 /**
- * Given a piece and a board, return a new piece that is shifted one position
- * to the left if able. Otherwise return the original piece.
+ * Given a piece and a board, return a new piece that is shifted based on the
+ * given function.
  *
+ * @param {function} fn Incrementing/decrementing function
  * @param {object} piece Tetromino piece
  * @param {object} board Game board
  * @return {object} Shifted piece
  */
-function shiftLeft(piece, board) {
+var shiftWith = curry(function shift(fn, piece, board) {
     return compose(
         ifElse(
             isValidPosition(__, board),
             identity,
             always(piece)
         ),
-        evolve({ x: dec })
+        evolve({ x: fn })
     )(piece);
-}
+});
 
 /**
  * Given a piece and a board, return a new piece that is shifted one position
@@ -284,16 +312,17 @@ function shiftLeft(piece, board) {
  * @param {object} board Game board
  * @return {object} Shifted piece
  */
-function shiftRight(piece, board) {
-    return compose(
-        ifElse(
-            isValidPosition(__, board),
-            identity,
-            always(piece)
-        ),
-        evolve({ x: inc })
-    )(piece);
-}
+var shiftLeft = shiftWith(dec);
+
+/**
+ * Given a piece and a board, return a new piece that is shifted one position
+ * to the left if able. Otherwise return the original piece.
+ *
+ * @param {object} piece Tetromino piece
+ * @param {object} board Game board
+ * @return {object} Shifted piece
+ */
+var shiftRight = shiftWith(inc);
 
 /**
  * Given a piece and a board, return a new board with the piece applied.
@@ -303,12 +332,49 @@ function shiftRight(piece, board) {
  * @return {object} Game board
  */
 function applyPiece(piece, board) {
+    return rotations[piece.shape][piece.rotation]
+        .reduce(function(result, cell) {
+            var boardX = adjustX(piece, cell);
+            var boardY = adjustY(piece, cell);
 
+            return update(
+                boardY,
+                update(boardX, piece.shape, result[boardY]),
+                result
+            );
+        }, board);
+}
+
+/**
+ * Return whether a given row is complete.
+ *
+ * @param {mixed[]} row Row to test
+ * @return {boolean}
+ */
+function isRowComplete(row) {
+    return !row.some(identical(0));
+}
+
+/**
+ * Return list of indexes of rows that have been completed.
+ *
+ * @param {object} board Game board
+ * @return {number[]}
+ */
+function findCompletedRows(board) {
+    return board.reduce(function(result, row, index) {
+        if (isRowComplete(row)) {
+            result.push(index);
+        }
+        return result;
+    }, []);
 }
 
 module.exports = {
+    applyPiece: applyPiece,
     createBoard: createBoard,
     createPiece: createPiece,
+    findCompletedRows: findCompletedRows,
     isValidPosition: isValidPosition,
     rotateLeft: rotateLeft,
     rotateRight: rotateRight,

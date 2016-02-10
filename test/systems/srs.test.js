@@ -33,12 +33,6 @@ test('systems.src.createBoard()', function(t) {
 test('systems.srs.createPiece()', function(t) {
     t.plan(7);
 
-    function testcase(opts) {
-        t.deepEqual(subject.createPiece.appy(null, opts.input),
-                    opts.expected,
-                    'returns expected ' + opts.input[0] + ' shape');
-    }
-
     'IJLOSTZ'.split('').forEach(function(shape) {
         t.deepEqual(subject.createPiece(shape), {
             shape: shape,
@@ -161,8 +155,9 @@ test('systems.src.applyPiece()', function(t) {
     var board = subject.createBoard();
     var piece = subject.createPiece('O');
     piece.y = 0;
+    var actual = subject.applyPiece(piece, board);
 
-    t.equal(subject.applyPiece(piece, board), [
+    t.deepEqual(actual, [
         [0, 0, 0, 0, 'O', 'O', 0, 0, 0, 0],
         [0, 0, 0, 0, 'O', 'O', 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -183,5 +178,42 @@ test('systems.src.applyPiece()', function(t) {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    ]);
+    ], 'applies legal piece to an empty board');
+
+    t.notEqual(actual, board, 'does not mutate board');
+
+    t.end();
+});
+
+test('systems.src.findCompletedRows()', function(t) {
+    var board = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        'OOOOOOOOOO'.split(''),
+        'OOOOOOOOOO'.split('')
+    ];
+
+    t.deepEqual(subject.findCompletedRows(board), [18, 19],
+                'finds indexes of rows that are complete');
+
+    t.deepEqual(subject.findCompletedRows(subject.createBoard()), [],
+                'returns empty list when no rows are complete');
+
+    t.end();
 });
