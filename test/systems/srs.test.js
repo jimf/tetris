@@ -1,4 +1,6 @@
 var test = require('tape');
+var lensProp = require('ramda/src/lensProp');
+var set = require('ramda/src/set');
 var subject = require('../../src/systems/srs');
 
 test('systems.src.createBoard()', function(t) {
@@ -214,6 +216,38 @@ test('systems.src.findCompletedRows()', function(t) {
 
     t.deepEqual(subject.findCompletedRows(subject.createBoard()), [],
                 'returns empty list when no rows are complete');
+
+    t.end();
+});
+
+test('systems.src.dropPiece()', function(t) {
+    var y = lensProp('y');
+
+    function testcase(opts) {
+        var actual = subject.dropPiece.apply(null, opts.input);
+        t.equal(actual.y, opts.expected, opts.msg);
+    }
+
+    testcase({
+        input: [
+            set(y, 0, subject.createPiece('O')),
+            subject.createBoard()
+        ],
+        expected: 18,
+        msg: 'drops to the bottom of an empty board'
+    });
+
+    testcase({
+        input: [
+            set(y, 0, subject.createPiece('O')),
+            subject.applyPiece(
+                set(y, 18, subject.createPiece('O')),
+                subject.createBoard()
+            )
+        ],
+        expected: 16,
+        msg: 'drops to the lowest possible position of a non-empty board'
+    });
 
     t.end();
 });

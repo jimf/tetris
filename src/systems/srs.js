@@ -16,7 +16,9 @@ var identity = require('ramda/src/identity');
 var ifElse = require('ramda/src/ifElse');
 var inc = require('ramda/src/inc');
 var modulo = require('ramda/src/modulo');
+var prop = require('ramda/src/prop');
 var range = require('ramda/src/range');
+var repeat = require('ramda/src/repeat');
 var times = require('ramda/src/times');
 var update = require('ramda/src/update');
 
@@ -168,9 +170,7 @@ var rotations = {
  * @return {int[]}
  */
 function createRow() {
-    return range(0, BOARD_WIDTH).map(function() {
-        return 0;
-    });
+    return repeat(0, BOARD_WIDTH);
 }
 
 /**
@@ -324,6 +324,18 @@ var shiftLeft = shiftWith(dec);
  */
 var shiftRight = shiftWith(inc);
 
+function dropPiece(piece, board) {
+    var lastPiece = piece;
+    var nextPiece = piece;
+
+    do {
+        lastPiece = nextPiece;
+        nextPiece = evolve({ y: inc }, lastPiece);
+    } while (isValidPosition(nextPiece, board));
+
+    return lastPiece;
+}
+
 /**
  * Given a piece and a board, return a new board with the piece applied.
  *
@@ -374,6 +386,7 @@ module.exports = {
     applyPiece: applyPiece,
     createBoard: createBoard,
     createPiece: createPiece,
+    dropPiece: dropPiece,
     findCompletedRows: findCompletedRows,
     isValidPosition: isValidPosition,
     rotateLeft: rotateLeft,
