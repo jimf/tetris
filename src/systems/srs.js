@@ -382,6 +382,16 @@ function findCompletedRows(board) {
     }, []);
 }
 
+function clearCompletedRows(board) {
+    var completedRows = findCompletedRows(board);
+
+    if (completedRows.length === 0) { return board; }
+
+    return board.reduce(function(result, row, index) {
+
+    });
+}
+
 module.exports = {
     applyPiece: applyPiece,
     createBoard: createBoard,
