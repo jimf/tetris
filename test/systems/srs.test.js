@@ -153,6 +153,36 @@ test('systems.src.shiftRight() without obstruction', function(t) {
     t.end();
 });
 
+test('systems.src.shiftDown()', function(t) {
+    var board = subject.createBoard();
+
+    function testcase(opts) {
+        var previous = subject.createPiece(opts.shape);
+        previous.y = 0;
+
+        opts.expectedShifts.forEach(function(shift) {
+            var shifted = subject.shiftDown(previous, board);
+            t.equal(shifted.y, shift);
+            previous = shifted;
+        });
+    }
+
+    var expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                    11, 12, 13, 14, 15, 16, 17, 18, 18];
+
+    [
+        { shape: 'I', expectedShifts: expected },
+        { shape: 'J', expectedShifts: expected },
+        { shape: 'L', expectedShifts: expected },
+        { shape: 'O', expectedShifts: expected },
+        { shape: 'S', expectedShifts: expected },
+        { shape: 'T', expectedShifts: expected },
+        { shape: 'Z', expectedShifts: expected }
+    ].forEach(testcase);
+
+    t.end();
+});
+
 test('systems.src.applyPiece()', function(t) {
     var board = subject.createBoard();
     var piece = subject.createPiece('O');
@@ -276,7 +306,7 @@ test('systems.src.clearCompletedRows()', function(t) {
         'OOOOOOOOOO'.split('')
     ];
 
-    t.deepEqual(system.clearCompletedRows(board), subject.createBoard(),
+    t.deepEqual(subject.clearCompletedRows(board), subject.createBoard(),
                 'clears rows that have been filled');
 
     t.end();

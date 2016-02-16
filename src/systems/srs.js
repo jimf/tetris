@@ -8,9 +8,11 @@ var __ = require('ramda/src/__');
 var add = require('ramda/src/add');
 var always = require('ramda/src/always');
 var compose = require('ramda/src/compose');
+var concat = require('ramda/src/concat');
 var curry = require('ramda/src/curry');
 var dec = require('ramda/src/dec');
 var evolve = require('ramda/src/evolve');
+var head = require('ramda/src/head');
 var identical = require('ramda/src/identical');
 var identity = require('ramda/src/identity');
 var ifElse = require('ramda/src/ifElse');
@@ -18,6 +20,7 @@ var inc = require('ramda/src/inc');
 var modulo = require('ramda/src/modulo');
 var prop = require('ramda/src/prop');
 var range = require('ramda/src/range');
+var remove = require('ramda/src/remove');
 var repeat = require('ramda/src/repeat');
 var times = require('ramda/src/times');
 var update = require('ramda/src/update');
@@ -206,7 +209,7 @@ function createPiece(shape) {
  * @return {boolean}
  */
 function isWithinBounds(x, y) {
-    return 0 <= x && x < BOARD_WIDTH && 0 <= y && y < BOARD_HEIGHT;
+    return 0 <= x && x < BOARD_WIDTH && -2 <= y && y < BOARD_HEIGHT;
 }
 
 /**
@@ -293,14 +296,14 @@ function rotateRight(piece, board) {
  * @param {object} board Game board
  * @return {object} Shifted piece
  */
-var shiftWith = curry(function shift(fn, piece, board) {
+var shiftWith = curry(function shift(fn, property, piece, board) {
     return compose(
         ifElse(
             isValidPosition(__, board),
             identity,
             always(piece)
         ),
-        evolve({ x: fn })
+        evolve({ [property]: fn })
     )(piece);
 });
 
@@ -312,7 +315,17 @@ var shiftWith = curry(function shift(fn, piece, board) {
  * @param {object} board Game board
  * @return {object} Shifted piece
  */
-var shiftLeft = shiftWith(dec);
+var shiftLeft = shiftWith(dec, 'x');
+
+/**
+ * Given a piece and a board, return a new piece that is shifted one position
+ * down if able. Otherwise return the original piece.
+ *
+ * @param {object} piece Tetromino piece
+ * @param {object} board Game board
+ * @return {object} Shifted piece
+ */
+var shiftRight = shiftWith(inc, 'x');
 
 /**
  * Given a piece and a board, return a new piece that is shifted one position
@@ -322,7 +335,7 @@ var shiftLeft = shiftWith(dec);
  * @param {object} board Game board
  * @return {object} Shifted piece
  */
-var shiftRight = shiftWith(inc);
+var shiftDown = shiftWith(inc, 'y');
 
 function dropPiece(piece, board) {
     var lastPiece = piece;
@@ -387,13 +400,15 @@ function clearCompletedRows(board) {
 
     if (completedRows.length === 0) { return board; }
 
-    return board.reduce(function(result, row, index) {
-
-    });
+    return compose(
+        concat(times(createRow, completedRows.length)),
+        remove(head(completedRows), completedRows.length)
+    )(board);
 }
 
 module.exports = {
     applyPiece: applyPiece,
+    clearCompletedRows: clearCompletedRows,
     createBoard: createBoard,
     createPiece: createPiece,
     dropPiece: dropPiece,
@@ -402,5 +417,6 @@ module.exports = {
     rotateLeft: rotateLeft,
     rotateRight: rotateRight,
     shiftLeft: shiftLeft,
-    shiftRight: shiftRight
+    shiftRight: shiftRight,
+    shiftDown: shiftDown
 };

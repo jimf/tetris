@@ -31,7 +31,7 @@
     "tape": "^4.0.0"
   },
   "dependencies": {
-    "lodash": "^4.2.1",
+    "lodash.shuffle": "^4.0.0",
     "ramda": "^0.19.1"
   }
 }
