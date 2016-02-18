@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "lodash.shuffle": "^4.0.0",
-    "ramda": "^0.19.1"
+    "ramda": "^0.19.1",
+    "union-type": "^0.2.0"
   }
 }

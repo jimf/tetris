@@ -19,47 +19,24 @@ function CanvasRenderer(canvasEl, options) {
     this.drawingContext = canvasEl.getContext('2d');
 }
 
-CanvasRenderer.prototype.start = function start() {
+CanvasRenderer.prototype.start = function start(update) {
     var tick = this.tick.bind(this);
     var ticker = function() {
-        tick();
+        tick(update);
         requestAnimationFrame(ticker);
     };
 
     ticker();
 };
 
-CanvasRenderer.prototype.tick = function tick() {
-    this.update();
-    this.draw();
+CanvasRenderer.prototype.tick = function tick(update) {
+    var state = update();
+    this.draw(state);
 };
 
-CanvasRenderer.prototype.update = function update() {};
-
-CanvasRenderer.prototype.draw = function draw() {
+CanvasRenderer.prototype.draw = function draw(state) {
     this.drawingContext.clearRect(0, 0, this.width, this.height);
-    this.drawBoard([
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        'OOOOOOOOOO'.split(''),
-        'OOOOOOOOOO'.split('')
-    ]);
+    this.drawBoard(state.board);
     this.drawGrid();
 };
 

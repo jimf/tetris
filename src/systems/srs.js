@@ -297,13 +297,16 @@ function rotateRight(piece, board) {
  * @return {object} Shifted piece
  */
 var shiftWith = curry(function shift(fn, property, piece, board) {
+    var evolveObj = {};
+    evolveObj[property] = fn;
+
     return compose(
         ifElse(
             isValidPosition(__, board),
             identity,
             always(piece)
         ),
-        evolve({ [property]: fn })
+        evolve(evolveObj)
     )(piece);
 });
 
@@ -395,6 +398,12 @@ function findCompletedRows(board) {
     }, []);
 }
 
+/**
+ * Given a board, return a new board with all completed rows removed.
+ *
+ * @param {object} board Game board
+ * @return {object}
+ */
 function clearCompletedRows(board) {
     var completedRows = findCompletedRows(board);
 
@@ -406,14 +415,37 @@ function clearCompletedRows(board) {
     )(board);
 }
 
+/**
+ * Given the number of lines cleared, return the current game level.
+ *
+ * @param {number} linesCleared Number of lines cleared
+ * @return {number}
+ */
+function level(linesCleared) {
+    return Math.floor(linesCleared / 10) + 1;
+}
+
+/**
+ * Given the number of lines cleared, return the number of ms that must elapse
+ * before the current piece will drop again.
+ *
+ * @param {number} linesCleared Number of lines cleared
+ * @return {number}
+ */
+function fallFrequency(linesCleared) {
+    return (0.27 - (level(linesCleared) * 0.02)) * 1000;
+}
+
 module.exports = {
     applyPiece: applyPiece,
     clearCompletedRows: clearCompletedRows,
     createBoard: createBoard,
     createPiece: createPiece,
     dropPiece: dropPiece,
+    fallFrequency: fallFrequency,
     findCompletedRows: findCompletedRows,
     isValidPosition: isValidPosition,
+    level: level,
     rotateLeft: rotateLeft,
     rotateRight: rotateRight,
     shiftLeft: shiftLeft,

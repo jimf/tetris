@@ -311,3 +311,17 @@ test('systems.src.clearCompletedRows()', function(t) {
 
     t.end();
 });
+
+test('systems.src.level()', function(t) {
+    [
+        { input:  0, expected: 1 },
+        { input:  9, expected: 1 },
+        { input: 10, expected: 2 },
+        { input: 19, expected: 2 },
+        { input: 20, expected: 3 }
+    ].forEach(function(testcase) {
+        t.equal(subject.level(testcase.input), testcase.expected);
+    });
+
+    t.end();
+});
